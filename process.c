@@ -5,6 +5,19 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <string.h>
+#include <signal.h>
+
+static void sighandler(int signo)
+{
+    if (signo == SIGINT)
+    {
+        remove("mario");
+        remove("luigi");
+        printf("\n");
+        exit(0);   
+    }
+}
 
 int phi(int n){ 
     int ans = n; 
@@ -21,27 +34,42 @@ int phi(int n){
 } 
 
 int main(){
+    signal(SIGINT, sighandler);
     char input [256];
     char output [256];
     int pipe;
-    
-    while(1){
-        // read number from mario
-        pipe = open("mario", O_RDONLY);
-        read(pipe, input, 256);
-        close(pipe);
-        // find phi(n)
-        int a = atoi(input);
-        int ans = phi(a);
-        // write answer to char array
-        
-        sprintf(output, "%d", ans); 
-
-        // write to luigi so prompt.c can read it
-        open("luigi", O_WRONLY);
-        write(pipe, input, sizeof(input));
-        printf("output: %s written to luigi\n", output);
-        close(pipe);
+    int inpipe = open("mario", O_RDONLY);
+    if (inpipe == -1) {
+        printf("errno: %d\terror: %s\n", errno, strerror(errno));
+        return -1;
     }
+
+    int outpipe = open("luigi", O_WRONLY);
+    if (outpipe == -1) {
+        printf("errno: %d\terror: %s\n", errno, strerror(errno));
+        return -1;
+    } 
+    char input [256] = "";
+    char output [256] = "";
+    while(1){
+        // read input from mario
+        int r = read(inpipe, &input, sizeof(input));
+        if (r == -1) {
+            printf("errno: %d\terror: %s\n", errno, strerror(errno));
+            break;
+        }
+        int ans = phi(atoi(input));
+        sprintf(output, "%d", ans);
+
+        // write processed input to luigi
+        int w = write(outpipe, &output, sizeof(output));
+        if (w == -1) {
+            printf("errno: %d\terror: %s\n", errno, strerror(errno));
+            break;
+        }
+    }
+
+    close(inpipe);
+    close(outpipe);
     return 0;
 }
