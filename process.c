@@ -34,7 +34,7 @@ int phi(int n){
 
 int main(){
     signal(SIGINT, sighandler);
-        mkfifo("mario", 0666);
+    mkfifo("mario", 0666);
     mkfifo("luigi", 0666);
     int inpipe = open("mario", O_RDONLY);
     if (inpipe == -1) {
