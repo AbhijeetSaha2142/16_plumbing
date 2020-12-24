@@ -34,7 +34,8 @@ int phi(int n){
 
 int main(){
     signal(SIGINT, sighandler);
-    int pipe;
+        mkfifo("mario", 0666);
+    mkfifo("luigi", 0666);
     int inpipe = open("mario", O_RDONLY);
     if (inpipe == -1) {
         printf("errno: %d\terror: %s\n", errno, strerror(errno));
