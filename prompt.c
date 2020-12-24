@@ -1,11 +1,11 @@
-#include <fcntl.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
+#include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <ctype.h>
 #include <signal.h>
 
 static void sighandler(int signo)
@@ -21,8 +21,6 @@ static void sighandler(int signo)
 
 int main(){
     signal(SIGINT, sighandler);
-    char input [256];
-    char output [256];
     mkfifo("mario", 0666);
     mkfifo("luigi", 0666);
     int inpipe = open("mario", O_WRONLY);

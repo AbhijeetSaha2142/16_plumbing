@@ -2,10 +2,9 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/types.h>
+#include <errno.h>
+#include <string.h>
 #include <sys/stat.h>
-#include <string.h>
-#include <string.h>
 #include <signal.h>
 
 static void sighandler(int signo)
@@ -35,8 +34,6 @@ int phi(int n){
 
 int main(){
     signal(SIGINT, sighandler);
-    char input [256];
-    char output [256];
     int pipe;
     int inpipe = open("mario", O_RDONLY);
     if (inpipe == -1) {
